@@ -1,13 +1,17 @@
+import io
 import json
 import os
 from time import gmtime, strftime
 
 import cv2
 import numpy
-from pycocotools import mask
 
 json_file = open('settings.json').read()
 settings = json.loads(json_file)
+
+
+def obj_dict(obj):
+    return obj.__dict__
 
 
 class image:
@@ -37,7 +41,7 @@ class annotation:
         self.bbox=None
         self.category_id=None
         self.id=None
-        self.iscrowd = 1
+        self.iscrowd = 0
 
 
 class licenses:
@@ -62,11 +66,12 @@ class info:
         self.contributor = None
         self.date_created = None
 
+
 class root:
     def __init__(self):
         self.info=None
         self.images=None
-        self.licences=None
+        # self.licences=None
         self.annotations=None
         self.categories=None
 
@@ -125,8 +130,8 @@ for cate in catelist:
         for i in range(1, retval):
             if (stats[i][4] > int(settings["envs"]["IgnoreSize"])):
                 objanno = annotation()
-                objanno.bbox = stats[i][0:3]
-                objanno.area = stats[i][4]
+                objanno.bbox = stats[i][0:4].tolist()
+                objanno.area = str(stats[i][4])
                 objanno.category_id = cate.id
                 image = [f for f in imglist if f.file_name == file_name]
                 if len(image) == 1:
@@ -135,11 +140,20 @@ for cate in catelist:
                     annoidcount = annoidcount + 1
                     cate_thresh = numpy.zeros(labels.shape, dtype=numpy.uint8)
                     cate_thresh[labels == i] = 255
+                    im2, contours, hierarchy = cv2.findContours(cate_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                     # cv2.imshow("cate",cate_thresh)
                     # cv2.waitKey()
-                    encoded = mask.encode(numpy.asfortranarray(cate_thresh))
-                    objanno.segmentation = encoded
-                    annolist.append(objanno)
+                    if len(contours) == 1:
+                        polygon = contours[0].reshape(-1)
+                        polygons = [polygon.tolist()]
+                        objanno.segmentation = polygons
+                        annolist.append(objanno)
+                    else:
+                        print("Warn: Find error when generate contours!")
+                    # encoded = mask.encode(numpy.asfortranarray(cate_thresh))
+                    # seg=segmentation()
+                    # seg.counts=str(encoded['counts'])
+                    # seg.size = str(encoded['size'])
                 else:
                     print("Error: Can not find image correspond to ", cate.name, " GT File: ", file_name)
             else:
@@ -154,8 +168,5 @@ jsonfile.annotations=annolist
 jsonfile.images = imglist
 jsonfile.categories = catelist
 
-def obj_dict(obj):
-    return obj.__dict__
-
-# with io.open('gt.json', 'w', encoding='utf-8') as f:
-#     f.write(json.dumps(jsonfile,default=obj_dict))
+with io.open('gt.json', 'w', encoding='utf-8') as f:
+    f.write(json.dumps(jsonfile, default=obj_dict))
