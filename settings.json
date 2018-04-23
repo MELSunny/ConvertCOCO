@@ -1,0 +1,28 @@
+{
+  "envs": {
+    "DataPath": "Test",
+    "ImgFmt": "bmp",
+    "Mode": "annotation",
+    "IgnoreSize": 0
+  },
+  "category": [
+    {
+      "id": 1,
+      "name": "polyp",
+      "supercategory": "default"
+    },
+    {
+      "id": 2,
+      "name": "lumen",
+      "supercategory": "default"
+    }
+  ],
+  "info": {
+    "description": "This is COCO dataset converted by ConvertCOCO",
+    "url": "https://github.com/MELSunny/ConvertCOCO",
+    "version": "1.0",
+    "year": 2018,
+    "contributor": "UoL LoVE Group",
+    "date_created": ""
+  }
+}

@@ -1,28 +1,35 @@
-
+import json
 import os
+from time import gmtime, strftime
+
 import cv2
 import numpy
+from pycocotools import mask
 
-import json
-import io
-DATA_PATH=r"Test"
-GT_PATH=os.path.join(DATA_PATH,"gt")
-IMG_FMT=".png"
+json_file = open('settings.json').read()
+settings = json.loads(json_file)
 
-class myimage:
+
+class image:
     def __init__(self):
         self.file_name=None
         self.id=None
         self.width=None
         self.height=None
+        self.coco_url = None
+        self.date_captured = None
+        self.flickr_url = None
+        self.license = None
 
-class mycategory:
+
+class category:
     def __init__(self):
         self.id=None
         self.name=None
         self.supercategory=None
 
-class myannotation:
+
+class annotation:
     def __init__(self):
         self.segmentation=None
         self.area=None
@@ -30,13 +37,30 @@ class myannotation:
         self.bbox=None
         self.category_id=None
         self.id=None
-        self.iscrowd=0
+        self.iscrowd = 1
 
 
-class mysegmentation:
+class licenses:
+    def __init__(self):
+        self.name = None
+        self.id = None
+        self.url = None
+
+
+class segmentation:
     def __init__(self):
         self.counts=None
         self.size=None
+
+
+class info:
+    def __init__(self):
+        self.description = None
+        self.url = None
+        self.version = None
+        self.year = None
+        self.contributor = None
+        self.date_created = None
 
 class root:
     def __init__(self):
@@ -46,83 +70,92 @@ class root:
         self.annotations=None
         self.categories=None
 
-catepolyp=mycategory()
-catepolyp.id=1
-catepolyp.name=""
-catepolyp.supercategory=""
-annoid=0
 
-imageslist=[]
+def dict2class(dict, classname):
+    object = eval(classname)()
+    for key, _ in object.__dict__.items():
+        setattr(object, key, dict[key])
+    return object
+
+
+catelist = []
+for jcate in settings["category"]:
+    catelist.append(dict2class(jcate, "category"))
+
+objinfo = info()
+objinfo.description = settings["info"]["description"]
+objinfo.contributor = settings["info"]["contributor"]
+objinfo.date_created = settings["info"]["date_created"]
+objinfo.url = settings["info"]["url"]
+objinfo.version = settings["info"]["version"]
+objinfo.year = settings["info"]["year"]
+if objinfo.date_created == "":
+    objinfo.date_created = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+imglist = []
 annolist=[]
-gtfiles = [f for f in os.listdir(GT_PATH) if os.path.isfile(os.path.join(GT_PATH, f)) and f.endswith(IMG_FMT)]
-for file in gtfiles:
-    myimg=myimage()
-    myimg.file_name=file
-    dbname, rest = file.split('_')
-    imgnum, _ = rest.split('.')
-    if dbname=="CVC-300":
-        myimg.id=1*10000+int(imgnum)
-    elif dbname=="CVC-612":
-        myimg.id = 2 * 10000 + int(imgnum)
-    img_path = os.path.join(GT_PATH, file)
 
+imgidcount = 0
+
+imgpath = os.path.join(settings["envs"]["DataPath"], 'SourceIMG')
+imgfiles = [f for f in os.listdir(imgpath) if
+            os.path.isfile(os.path.join(imgpath, f)) and f.endswith(settings["envs"]["ImgFmt"])]
+for file in imgfiles:
+    objimage = image()
+    objimage.file_name = file
+    img_path = os.path.join(imgpath, file)
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    myimg.height,myimg.width = img.shape
-    imageslist.append(myimg)
-    ret, thresh = cv2.threshold(img, 127, 255, 0)
-    im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, 2)
-    if len(contours)>1:
-        print("warn: find more than 1 object on",dbname ,imgnum)
+    objimage.height, objimage.width = img.shape
+    objimage.id = imgidcount
+    imgidcount = imgidcount + 1
+    imglist.append(objimage)
 
-    for cnt in contours:
-        if(cv2.contourArea(cnt)>20):
-            myanno = myannotation()
-            myanno.bbox = cv2.boundingRect(cnt)
-            myanno.area= cv2.contourArea(cnt)
-            myanno.category_id=1
-            myanno.image_id=myimg.id
-            myanno.id=annoid
-            annoid=annoid+1
-            annolist.append(myanno)
-        else:
-            print("skip 1 object (area:",cv2.contourArea(cnt)+1,") on", dbname, imgnum)
-print "totalnum=",annoid
+annoidcount = 0
+for cate in catelist:
+    gtpath = os.path.join(settings["envs"]["DataPath"], 'gt' + cate.name)
+    gtfiles = [f for f in os.listdir(gtpath) if
+               os.path.isfile(os.path.join(gtpath, f)) and f.endswith(settings["envs"]["ImgFmt"])]
+    for file_name in gtfiles:
+        currgtpath = os.path.join(gtpath, file_name)
+        print(currgtpath)
+        img = cv2.imread(currgtpath, cv2.IMREAD_GRAYSCALE)
+        ret, thresh = cv2.threshold(img, 127, 255, 0)
 
+        retval, labels, stats, _ = cv2.connectedComponentsWithStats(thresh)
+        for i in range(1, retval):
+            if (stats[i][4] > int(settings["envs"]["IgnoreSize"])):
+                objanno = annotation()
+                objanno.bbox = stats[i][0:3]
+                objanno.area = stats[i][4]
+                objanno.category_id = cate.id
+                image = [f for f in imglist if f.file_name == file_name]
+                if len(image) == 1:
+                    objanno.image_id = image[0].id
+                    objanno.id = annoidcount
+                    annoidcount = annoidcount + 1
+                    cate_thresh = numpy.zeros(labels.shape, dtype=numpy.uint8)
+                    cate_thresh[labels == i] = 255
+                    # cv2.imshow("cate",cate_thresh)
+                    # cv2.waitKey()
+                    encoded = mask.encode(numpy.asfortranarray(cate_thresh))
+                    objanno.segmentation = encoded
+                    annolist.append(objanno)
+                else:
+                    print("Error: Can not find image correspond to ", cate.name, " GT File: ", file_name)
+            else:
+                print("skip 1 object (area:", stats[i][4], ") on ", cate.name, " GT File:", file_name)
+
+print("Total num=", annoidcount)
 
 
 jsonfile=root()
+jsonfile.info = objinfo
 jsonfile.annotations=annolist
-jsonfile.images=imageslist
-jsonfile.categories=[catepolyp]
+jsonfile.images = imglist
+jsonfile.categories = catelist
 
 def obj_dict(obj):
     return obj.__dict__
 
-with io.open('gt.json', 'w', encoding='utf-8') as f:
-    f.write(unicode(json.dumps(jsonfile,default=obj_dict)))
-
-    # img = cv2.imread(img_path, as_grey=True)
-    # img=img_as_ubyte(img)
-    # myimg.height,myimg.width = img.shape
-    # imageslist.append(myimg)
-    # arrimg = numpy.asfortranarray(img)
-    #
-    # encoded = encode(arrimg)
-    # # areas=area(encoded)
-    # bboxes=toBbox(encoded)
-    # print (dbname, imgnum)
-    # if (areas.size>1):
-    #     print ('Warn:',dbname,imgnum,"has more than 1 object")
-    # for i in range(0,areas.size):
-    #     myanno = myannotation()
-    #     if areas.size==1:
-    #         myanno.area=areas
-    #         myanno.bboxes=bboxes
-    #     else:
-    #         myanno.area=areas[i]
-    #         myanno.bboxes=bboxes[i]
-    #     myanno.category_id=1
-    #     myanno.imageid=myimg.id
-    #     myanno.id=annoid
-    #     annoid=annoid+1
-    #     annolist.append(myanno)
+# with io.open('gt.json', 'w', encoding='utf-8') as f:
+#     f.write(json.dumps(jsonfile,default=obj_dict))
