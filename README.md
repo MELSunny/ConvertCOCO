@@ -39,4 +39,4 @@ info&emsp;&emsp;//Just modify it whatever you like
 &emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
 &emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
 ### Generate gt.json  
-Please run gt2json.py, if anything below is done.
+Please run gt2json.py, if anything above is done.
