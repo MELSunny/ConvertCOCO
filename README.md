@@ -26,16 +26,17 @@ category&emsp;&emsp;//Your dataset category description
 info&emsp;&emsp;//Just modify it whatever you like
 ### Structure of dataset path
 Dataset
-&emsp;gt+<category name1>
-&emsp;&emsp;gtimage1.<ImgFmt>
-&emsp;&emsp;gtimage2.<ImgFmt>
-&emsp;&emsp;gtimage3.<ImgFmt>
-&emsp;gt+<category name2>
-&emsp;&emsp;gtimage1.<ImgFmt>
-&emsp;&emsp;gtimage2.<ImgFmt>
-&emsp;&emsp;gtimage3.<ImgFmt>
-&emsp;gt+<category name3>
-&emsp;&emsp;gtimage1.<ImgFmt>
-&emsp;&emsp;gtimage2.<ImgFmt>
-&emsp;&emsp;gtimage3.<ImgFmt>
-After finish editing settings.json, please run gt2json.py
+&emsp;gt+<category name1>  
+&emsp;&emsp;gtimage1.<ImgFmt>  
+&emsp;&emsp;gtimage2.<ImgFmt>  
+&emsp;&emsp;gtimage3.<ImgFmt>  
+&emsp;gt+<category name2>  
+&emsp;&emsp;gtimage1.<ImgFmt>  
+&emsp;&emsp;gtimage2.<ImgFmt>  
+&emsp;&emsp;gtimage3.<ImgFmt>  
+&emsp;gt+<category name3>  
+&emsp;&emsp;gtimage1.<ImgFmt>  
+&emsp;&emsp;gtimage2.<ImgFmt>  
+&emsp;&emsp;gtimage3.<ImgFmt>  
+### Generate gt.json  
+Please run gt2json.py, if anything below is done.
