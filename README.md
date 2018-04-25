@@ -1,6 +1,6 @@
 # ConvertCOCO
 ## Description
-This project is the toolbox to convert our own dataset into COCO dataset.
+This project is the toolbox to convert your own dataset to COCO dataset.
 
 ## Installation
 Please install the environment by anaconda
