@@ -25,18 +25,18 @@ category&emsp;&emsp;//Your dataset category description
 &emsp;supercategory&emsp;&emsp;//Super Category. For example: For category: boy,girl,man,woman. Their super category is human.  
 info&emsp;&emsp;//Just modify it whatever you like
 ### Structure of dataset path
-Dataset  
-&emsp;gt+<category name1>  
-&emsp;&emsp;gtimage1.<ImgFmt>  
-&emsp;&emsp;gtimage2.<ImgFmt>  
-&emsp;&emsp;gtimage3.<ImgFmt>  
-&emsp;gt+<category name2>  
-&emsp;&emsp;gtimage1.<ImgFmt>  
-&emsp;&emsp;gtimage2.<ImgFmt>  
-&emsp;&emsp;gtimage3.<ImgFmt>  
-&emsp;gt+<category name3>  
-&emsp;&emsp;gtimage1.<ImgFmt>  
-&emsp;&emsp;gtimage2.<ImgFmt>  
-&emsp;&emsp;gtimage3.<ImgFmt>  
+&lt;DataPath&gt;  
+&emsp;gt+&lt;category name1&gt;  
+&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
+&emsp;gt+&lt;category name2&gt;  
+&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
+&emsp;gt+&lt;category name3&gt;  
+&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
+&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
 ### Generate gt.json  
 Please run gt2json.py, if anything below is done.
