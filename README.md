@@ -27,16 +27,20 @@ info&emsp;&emsp;//Just modify it whatever you like
 ### Structure of dataset path
 &lt;DataPath&gt;  
 &emsp;gt+&lt;category name1&gt;  
-&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
+&emsp;&emsp;image1.&lt;ImgFmt&gt;  
+&emsp;&emsp;image2.&lt;ImgFmt&gt;  
+&emsp;&emsp;image3.&lt;ImgFmt&gt;  
 &emsp;gt+&lt;category name2&gt;  
-&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
+&emsp;&emsp;image1.&lt;ImgFmt&gt;  
+&emsp;&emsp;image2.&lt;ImgFmt&gt;  
+&emsp;&emsp;image3.&lt;ImgFmt&gt;  
 &emsp;gt+&lt;category name3&gt;  
-&emsp;&emsp;gtimage1.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage2.&lt;ImgFmt&gt;  
-&emsp;&emsp;gtimage3.&lt;ImgFmt&gt;  
+&emsp;&emsp;image1.&lt;ImgFmt&gt;  
+&emsp;&emsp;image2.&lt;ImgFmt&gt;  
+&emsp;&emsp;image3.&lt;ImgFmt&gt;  
+&emsp;SourceIMG  
+&emsp;&emsp;image1.&lt;ImgFmt&gt;  
+&emsp;&emsp;image2.&lt;ImgFmt&gt;  
+&emsp;&emsp;image3.&lt;ImgFmt&gt;  
 ### Generate gt.json  
 Please run gt2json.py, if anything above is done.
